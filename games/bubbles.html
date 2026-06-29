@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pop the Bubbles · LuffyxBoa</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="game-page">
+    <a href="../index.html" class="back-link">← back home</a>
+    <h1>Pop the bubbles</h1>
+    <p class="tagline">tap every bubble — don't leave any behind</p>
+
+    <div class="score-bar">
+      <div>popped: <span id="score">0</span></div>
+      <div>left: <span id="remaining">0</span></div>
+    </div>
+
+    <canvas id="canvas" width="640" height="400"></canvas>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="init()">new bubbles</button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let bubbles = [], score = 0;
+    const colors = ['#C4895A','#7F77DD','#1D9E75','#D85A30','#D4537E','#378ADD','#E9A84C'];
+
+    function init() {
+      score = 0;
+      document.getElementById('score').textContent = 0;
+      bubbles = [];
+      for (let i = 0; i < 30; i++) {
+        const r = 16 + Math.random() * 24;
+        let x, y, ok, tries = 0;
+        do {
+          x = r + Math.random() * (canvas.width - 2 * r);
+          y = r + Math.random() * (canvas.height - 2 * r);
+          ok = bubbles.every(b => Math.hypot(b.x - x, b.y - y) > b.r + r + 4);
+          tries++;
+        } while (!ok && tries < 60);
+        bubbles.push({ x, y, r, color: colors[Math.floor(Math.random() * colors.length)], alive: true });
+      }
+      document.getElementById('remaining').textContent = bubbles.length;
+      draw();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      bubbles.forEach(b => {
+        if (!b.alive) return;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.fillStyle = b.color + '30';
+        ctx.fill();
+        ctx.strokeStyle = b.color;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        // shine
+        ctx.beginPath();
+        ctx.arc(b.x - b.r * 0.28, b.y - b.r * 0.28, b.r * 0.18, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.55)';
+        ctx.fill();
+      });
+    }
+
+    function pop(b) {
+      b.alive = false;
+      score++;
+      document.getElementById('score').textContent = score;
+      document.getElementById('remaining').textContent = bubbles.filter(x => x.alive).length;
+      let frame = 0;
+      const anim = setInterval(() => {
+        draw();
+        ctx.save();
+        ctx.globalAlpha = 1 - frame / 10;
+        ctx.strokeStyle = b.color;
+        ctx.lineWidth = 1.5;
+        for (let i = 0; i < 7; i++) {
+          const a = (i / 7) * Math.PI * 2;
+          const d = b.r * (1.2 + frame * 0.25);
+          ctx.beginPath();
+          ctx.moveTo(b.x + Math.cos(a) * b.r * 0.5, b.y + Math.sin(a) * b.r * 0.5);
+          ctx.lineTo(b.x + Math.cos(a) * d, b.y + Math.sin(a) * d);
+          ctx.stroke();
+        }
+        ctx.restore();
+        if (++frame > 10) clearInterval(anim);
+      }, 35);
+    }
+
+    canvas.addEventListener('click', e => {
+      const rect = canvas.getBoundingClientRect();
+      const sx = canvas.width / rect.width, sy = canvas.height / rect.height;
+      const mx = (e.clientX - rect.left) * sx, my = (e.clientY - rect.top) * sy;
+      bubbles.forEach(b => {
+        if (b.alive && Math.hypot(b.x - mx, b.y - my) < b.r) pop(b);
+      });
+    });
+
+    canvas.addEventListener('touchstart', e => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const sx = canvas.width / rect.width, sy = canvas.height / rect.height;
+      Array.from(e.touches).forEach(t => {
+        const mx = (t.clientX - rect.left) * sx, my = (t.clientY - rect.top) * sy;
+        bubbles.forEach(b => {
+          if (b.alive && Math.hypot(b.x - mx, b.y - my) < b.r) pop(b);
+        });
+      });
+    });
+
+    init();
+  </script>
+</body>
+</html>
