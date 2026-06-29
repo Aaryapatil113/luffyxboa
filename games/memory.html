@@ -1,96 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Memory Match · LuffyxBoa</title>
-  <link rel="stylesheet" href="../css/style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memory Match · LuffyxBoa</title>
+    <link rel="stylesheet" href="../css/style.css" />
 </head>
 <body>
-  <div class="game-page">
+<nav class="topbar">
+    <a href="../index.html" class="topbar-logo">Luffy<em>×</em>Boa</a>
+    <div class="topbar-links">
+        <a href="../index.html#games">games</a>
+        <a href="../index.html#photos">photos</a>
+    </div>
+</nav>
+
+<div class="game-page">
     <a href="../index.html" class="back-link">← back home</a>
     <h1>Memory match</h1>
     <p class="tagline">flip the cards — find all the pairs</p>
 
     <div class="score-bar">
-      <div>moves: <span id="moves">0</span></div>
-      <div>pairs: <span id="pairs">0</span> / 8</div>
+        <div>moves: <span id="moves">0</span></div>
+        <div>pairs: <span id="pairs">0</span> / 8</div>
     </div>
 
     <div class="memory-grid" id="grid"></div>
 
     <div id="congrats" style="display:none">
-      <p class="congrats">you got them all! 🎉</p>
+        <p class="congrats">you got them all! 🎉</p>
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-primary" onclick="init()">new game</button>
+        <button class="btn btn-primary" onclick="init()">new game</button>
     </div>
-  </div>
+</div>
 
-  <script>
+<script>
     const emojis = ['🌸','⭐','🍀','🦋','🌈','🎈','🍭','🎵'];
     let state = [], flipped = [], moves = 0, pairs = 0, locked = false;
 
     function init() {
-      moves = 0; pairs = 0; flipped = []; locked = false;
-      document.getElementById('moves').textContent = 0;
-      document.getElementById('pairs').textContent = 0;
-      document.getElementById('congrats').style.display = 'none';
+        moves = 0; pairs = 0; flipped = []; locked = false;
+        document.getElementById('moves').textContent = 0;
+        document.getElementById('pairs').textContent = 0;
+        document.getElementById('congrats').style.display = 'none';
 
-      const deck = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
-      state = deck.map((e, i) => ({ id: i, emoji: e, flipped: false, matched: false }));
+        const deck = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
+        state = deck.map((e, i) => ({ id: i, emoji: e, flipped: false, matched: false }));
 
-      const grid = document.getElementById('grid');
-      grid.innerHTML = '';
-      state.forEach(c => {
-        const el = document.createElement('div');
-        el.className = 'mem-card';
-        el.dataset.id = c.id;
-        el.innerHTML = '<span class="mem-back">?</span>';
-        el.addEventListener('click', () => flip(c.id));
-        grid.appendChild(el);
-      });
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        state.forEach(c => {
+            const el = document.createElement('div');
+            el.className = 'mem-card';
+            el.dataset.id = c.id;
+            el.innerHTML = '<span class="mem-back">?</span>';
+            el.addEventListener('click', () => flip(c.id));
+            grid.appendChild(el);
+        });
     }
 
     function flip(id) {
-      if (locked) return;
-      const card = state[id];
-      if (card.flipped || card.matched) return;
-      card.flipped = true;
-      const el = document.querySelector(`[data-id="${id}"]`);
-      el.textContent = card.emoji;
-      el.classList.add('flipped');
-      flipped.push(id);
+        if (locked) return;
+        const card = state[id];
+        if (card.flipped || card.matched) return;
+        card.flipped = true;
+        const el = document.querySelector(`[data-id="${id}"]`);
+        el.textContent = card.emoji;
+        el.classList.add('flipped');
+        flipped.push(id);
 
-      if (flipped.length === 2) {
-        locked = true;
-        moves++;
-        document.getElementById('moves').textContent = moves;
-        const [a, b] = flipped;
-        if (state[a].emoji === state[b].emoji) {
-          state[a].matched = state[b].matched = true;
-          document.querySelector(`[data-id="${a}"]`).classList.replace('flipped', 'matched');
-          document.querySelector(`[data-id="${b}"]`).classList.replace('flipped', 'matched');
-          pairs++;
-          document.getElementById('pairs').textContent = pairs;
-          flipped = []; locked = false;
-          if (pairs === 8) document.getElementById('congrats').style.display = 'block';
-        } else {
-          setTimeout(() => {
-            [a, b].forEach(id => {
-              state[id].flipped = false;
-              const el = document.querySelector(`[data-id="${id}"]`);
-              el.innerHTML = '<span class="mem-back">?</span>';
-              el.classList.remove('flipped');
-            });
-            flipped = []; locked = false;
-          }, 850);
+        if (flipped.length === 2) {
+            locked = true;
+            moves++;
+            document.getElementById('moves').textContent = moves;
+            const [a, b] = flipped;
+            if (state[a].emoji === state[b].emoji) {
+                state[a].matched = state[b].matched = true;
+                document.querySelector(`[data-id="${a}"]`).classList.replace('flipped', 'matched');
+                document.querySelector(`[data-id="${b}"]`).classList.replace('flipped', 'matched');
+                pairs++;
+                document.getElementById('pairs').textContent = pairs;
+                flipped = []; locked = false;
+                if (pairs === 8) document.getElementById('congrats').style.display = 'block';
+            } else {
+                setTimeout(() => {
+                    [a, b].forEach(id => {
+                        state[id].flipped = false;
+                        const el = document.querySelector(`[data-id="${id}"]`);
+                        el.innerHTML = '<span class="mem-back">?</span>';
+                        el.classList.remove('flipped');
+                    });
+                    flipped = []; locked = false;
+                }, 850);
+            }
         }
-      }
     }
 
     init();
-  </script>
+</script>
 </body>
 </html>

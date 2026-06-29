@@ -1,136 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Catch the Hearts · LuffyxBoa</title>
-  <link rel="stylesheet" href="../css/style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Catch the Hearts · LuffyxBoa</title>
+    <link rel="stylesheet" href="../css/style.css" />
 </head>
 <body>
-  <div class="game-page">
+<nav class="topbar">
+    <a href="../index.html" class="topbar-logo">Luffy<em>×</em>Boa</a>
+    <div class="topbar-links">
+        <a href="../index.html#games">games</a>
+        <a href="../index.html#photos">photos</a>
+    </div>
+</nav>
+
+<div class="game-page">
     <a href="../index.html" class="back-link">← back home</a>
     <h1>Catch the hearts</h1>
     <p class="tagline">move your basket — don't let love fall</p>
 
     <div class="score-bar">
-      <div>caught: <span id="score">0</span></div>
-      <div>missed: <span id="missed">0</span></div>
+        <div>caught: <span id="score">0</span></div>
+        <div>missed: <span id="missed">0</span></div>
     </div>
 
     <canvas id="canvas" width="640" height="400"></canvas>
 
     <div class="btn-row">
-      <button class="btn btn-primary" id="start-btn" onclick="startGame()">play</button>
-      <button class="btn btn-outline" onclick="stopGame()">stop</button>
+        <button class="btn btn-primary" onclick="startGame()">play</button>
+        <button class="btn btn-outline" onclick="stopGame()">stop</button>
     </div>
-  </div>
+</div>
 
-  <script>
+<script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    const colors = ['#D4537E','#C4895A','#D85A30','#7F77DD','#E9A84C'];
+    const colors = ['#C4895A','#A86D40','#D4A574','#8B6A4F','#2E2218'];
     let hearts = [], score = 0, missed = 0, running = false;
     let spawnInterval = null, animFrame = null;
     let basket = { x: 280, w: 90 };
 
     canvas.addEventListener('mousemove', e => {
-      const rect = canvas.getBoundingClientRect();
-      basket.x = (e.clientX - rect.left) * (canvas.width / rect.width) - basket.w / 2;
+        const rect = canvas.getBoundingClientRect();
+        basket.x = (e.clientX - rect.left) * (canvas.width / rect.width) - basket.w / 2;
     });
     canvas.addEventListener('touchmove', e => {
-      e.preventDefault();
-      const rect = canvas.getBoundingClientRect();
-      basket.x = (e.touches[0].clientX - rect.left) * (canvas.width / rect.width) - basket.w / 2;
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        basket.x = (e.touches[0].clientX - rect.left) * (canvas.width / rect.width) - basket.w / 2;
     }, { passive: false });
 
     function startGame() {
-      stopGame();
-      hearts = []; score = 0; missed = 0;
-      document.getElementById('score').textContent = 0;
-      document.getElementById('missed').textContent = 0;
-      running = true;
-      spawnInterval = setInterval(spawnHeart, 700);
-      loop();
+        stopGame();
+        hearts = []; score = 0; missed = 0;
+        document.getElementById('score').textContent = 0;
+        document.getElementById('missed').textContent = 0;
+        running = true;
+        spawnInterval = setInterval(spawnHeart, 700);
+        loop();
     }
 
     function stopGame() {
-      running = false;
-      clearInterval(spawnInterval);
-      cancelAnimationFrame(animFrame);
+        running = false;
+        clearInterval(spawnInterval);
+        cancelAnimationFrame(animFrame);
     }
 
     function spawnHeart() {
-      if (!running) return;
-      hearts.push({
-        x: 30 + Math.random() * (canvas.width - 60),
-        y: -24,
-        speed: 1.8 + Math.random() * 2.2,
-        size: 14 + Math.random() * 10,
-        color: colors[Math.floor(Math.random() * colors.length)]
-      });
+        if (!running) return;
+        hearts.push({
+            x: 30 + Math.random() * (canvas.width - 60),
+            y: -24,
+            speed: 1.8 + Math.random() * 2.2,
+            size: 14 + Math.random() * 10,
+            color: colors[Math.floor(Math.random() * colors.length)]
+        });
     }
 
     function drawHeart(x, y, s, color) {
-      ctx.save();
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.moveTo(x, y + s * 0.4);
-      ctx.bezierCurveTo(x, y, x - s, y, x - s, y + s * 0.4);
-      ctx.bezierCurveTo(x - s, y + s * 0.8, x, y + s * 1.2, x, y + s * 1.4);
-      ctx.bezierCurveTo(x, y + s * 1.2, x + s, y + s * 0.8, x + s, y + s * 0.4);
-      ctx.bezierCurveTo(x + s, y, x, y, x, y + s * 0.4);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(x, y + s * 0.4);
+        ctx.bezierCurveTo(x, y, x - s, y, x - s, y + s * 0.4);
+        ctx.bezierCurveTo(x - s, y + s * 0.8, x, y + s * 1.2, x, y + s * 1.4);
+        ctx.bezierCurveTo(x, y + s * 1.2, x + s, y + s * 0.8, x + s, y + s * 0.4);
+        ctx.bezierCurveTo(x + s, y, x, y, x, y + s * 0.4);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
     }
 
     function loop() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#FAF6EF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // basket
-      const bx = Math.max(0, Math.min(canvas.width - basket.w, basket.x));
-      ctx.beginPath();
-      ctx.roundRect(bx, canvas.height - 40, basket.w, 32, 8);
-      ctx.fillStyle = '#C4895A22';
-      ctx.fill();
-      ctx.strokeStyle = '#C4895A';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      ctx.fillStyle = '#A86D40';
-      ctx.font = '12px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('your hands 🤲', bx + basket.w / 2, canvas.height - 20);
+        const bx = Math.max(0, Math.min(canvas.width - basket.w, basket.x));
+        ctx.beginPath();
+        ctx.roundRect(bx, canvas.height - 40, basket.w, 32, 8);
+        ctx.fillStyle = '#C4895A22';
+        ctx.fill();
+        ctx.strokeStyle = '#C4895A';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = '#A86D40';
+        ctx.font = '12px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('your hands 🤲', bx + basket.w / 2, canvas.height - 20);
 
-      hearts = hearts.filter(h => {
-        h.y += h.speed;
-        drawHeart(h.x, h.y, h.size, h.color);
+        hearts = hearts.filter(h => {
+            h.y += h.speed;
+            drawHeart(h.x, h.y, h.size, h.color);
+            if (h.y + h.size * 1.4 > canvas.height - 40 && h.y < canvas.height - 8 && h.x > bx && h.x < bx + basket.w) {
+                score++;
+                document.getElementById('score').textContent = score;
+                return false;
+            }
+            if (h.y > canvas.height + 30) {
+                missed++;
+                document.getElementById('missed').textContent = missed;
+                return false;
+            }
+            return true;
+        });
 
-        if (h.y + h.size * 1.4 > canvas.height - 40 &&
-            h.y < canvas.height - 8 &&
-            h.x > bx && h.x < bx + basket.w) {
-          score++;
-          document.getElementById('score').textContent = score;
-          return false;
-        }
-        if (h.y > canvas.height + 30) {
-          missed++;
-          document.getElementById('missed').textContent = missed;
-          return false;
-        }
-        return true;
-      });
-
-      if (running) animFrame = requestAnimationFrame(loop);
+        if (running) animFrame = requestAnimationFrame(loop);
     }
-
-    // draw idle state
-    ctx.fillStyle = '#C4895A22';
-    ctx.strokeStyle = '#C4895A';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.roundRect(basket.x, canvas.height - 40, basket.w, 32, 8);
-    ctx.fill();
-    ctx.stroke();
-  </script>
+</script>
 </body>
 </html>
