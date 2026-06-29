@@ -28,7 +28,6 @@
             z-index: 0;
         }
         .hero > * { position: relative; z-index: 1; }
-
         .hero-eyebrow {
             font-size: 12px;
             letter-spacing: 0.14em;
@@ -65,12 +64,187 @@
             50% { transform: translateY(6px); }
         }
 
-        /* ---- SECTIONS ---- */
-        .section {
-            max-width: 860px;
-            margin: 0 auto;
-            padding: 4rem 1.5rem;
+        /* ---- PROFILE ---- */
+        .profile-section {
+            background: #1a0e0a;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 42% 1fr;
+            position: relative;
+            overflow: hidden;
         }
+
+        /* left — full bleed image */
+        .profile-img-col {
+            position: relative;
+            min-height: 100vh;
+        }
+        .profile-img-col img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+            display: block;
+        }
+        .profile-img-placeholder {
+            width: 100%;
+            height: 100%;
+            min-height: 100vh;
+            background: #2E1A10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: rgba(232,196,160,0.4);
+            text-align: center;
+            padding: 2rem;
+            line-height: 2;
+        }
+        /* gradient fade from image into right panel */
+        .profile-img-col::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, transparent 60%, #1a0e0a 100%),
+            linear-gradient(to top, #1a0e0a 0%, transparent 20%);
+        }
+
+        /* series tag top-left */
+        .profile-series {
+            position: absolute;
+            top: 2rem;
+            left: 1.5rem;
+            z-index: 2;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            color: rgba(196,137,90,0.7);
+            text-transform: uppercase;
+        }
+
+        /* right — info panel */
+        .profile-info-col {
+            padding: 3rem 2.5rem 3rem 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .profile-vol {
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--caramel);
+            margin-bottom: 0.75rem;
+        }
+
+        .profile-name {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(42px, 5.5vw, 72px);
+            font-weight: 700;
+            line-height: 0.92;
+            color: #FAF6EF;
+            text-transform: uppercase;
+            letter-spacing: 0.01em;
+            margin-bottom: 0.5rem;
+        }
+        .profile-name em {
+            display: block;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 0.38em;
+            color: var(--caramel);
+            letter-spacing: 0.06em;
+            text-transform: none;
+            margin-top: 6px;
+        }
+
+        .profile-rule {
+            width: 48px;
+            height: 1.5px;
+            background: var(--caramel);
+            opacity: 0.5;
+            margin: 1.25rem 0;
+        }
+
+        .profile-bio {
+            font-size: 13px;
+            line-height: 1.85;
+            color: rgba(232,196,160,0.75);
+            margin-bottom: 1.75rem;
+            max-width: 360px;
+        }
+
+        /* occupation block like the reference */
+        .profile-block {
+            margin-bottom: 1.5rem;
+        }
+        .profile-block-label {
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--caramel);
+            margin-bottom: 8px;
+            border-left: 2px solid var(--caramel);
+            padding-left: 8px;
+        }
+        .profile-block-content {
+            font-size: 12px;
+            color: rgba(232,196,160,0.7);
+            line-height: 1.7;
+            padding-left: 10px;
+        }
+
+        /* stat grid */
+        .profile-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 1.5rem;
+        }
+        .profile-stat {
+            background: rgba(255,255,255,0.03);
+            border: 0.5px solid rgba(196,137,90,0.2);
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+        .profile-stat-label {
+            font-size: 8px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--caramel);
+            margin-bottom: 4px;
+        }
+        .profile-stat-value { font-size: 12px; color: #FAF6EF; font-weight: 500; }
+
+        /* tags */
+        .profile-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .profile-tag {
+            font-size: 10px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(196,137,90,0.35);
+            color: rgba(232,196,160,0.7);
+            letter-spacing: 0.05em;
+        }
+
+        /* episode strip at bottom left of image */
+        .profile-ep {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            z-index: 2;
+            font-size: 11px;
+            color: rgba(232,196,160,0.5);
+            letter-spacing: 0.06em;
+        }
+        .profile-ep strong { color: rgba(232,196,160,0.85); }
+
+        /* ---- SECTIONS ---- */
+        .section { max-width: 860px; margin: 0 auto; padding: 4rem 1.5rem; }
         .section-label {
             font-size: 11px;
             letter-spacing: 0.16em;
@@ -87,20 +261,10 @@
         }
 
         /* ---- DIVIDER ---- */
-        .divider {
-            width: 60px;
-            height: 1.5px;
-            background: var(--caramel);
-            margin: 0 auto;
-            opacity: 0.35;
-        }
+        .divider { width: 60px; height: 1.5px; background: var(--caramel); margin: 0 auto; opacity: 0.35; }
 
         /* ---- GAMES GRID ---- */
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-        }
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
         .game-card {
             background: var(--light);
             border: 1px solid var(--beige3);
@@ -123,11 +287,7 @@
         .game-card-desc { font-size: 13px; color: var(--mid); }
 
         /* ---- PHOTOS ---- */
-        .photos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 12px;
-        }
+        .photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
         .photo-slot {
             aspect-ratio: 1;
             border-radius: 12px;
@@ -150,6 +310,14 @@
             border-top: 1px solid var(--beige3);
             background: var(--beige2);
         }
+
+        @media (max-width: 680px) {
+            .profile-section { grid-template-columns: 1fr; }
+            .profile-img-col { min-height: 60vw; max-height: 70vw; }
+            .profile-img-col::after { background: linear-gradient(to bottom, transparent 60%, #1a0e0a 100%); }
+            .profile-info-col { padding: 2rem 1.5rem; }
+            .profile-series { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -157,6 +325,7 @@
 <nav class="topbar">
     <a href="index.html" class="topbar-logo">Luffy<em>×</em>Boa</a>
     <div class="topbar-links">
+        <a href="#profile">him</a>
         <a href="#games">games</a>
         <a href="#photos">photos</a>
     </div>
@@ -167,8 +336,70 @@
     <p class="hero-eyebrow">made with love, just for you</p>
     <h1 class="hero-title">Luffy<em>×</em>Boa</h1>
     <p class="hero-message">Muah 💛</p>
-    <a href="#games" class="btn btn-primary">open your gifts ↓</a>
+    <a href="#profile" class="btn btn-primary">meet the captain ↓</a>
     <p class="scroll-hint">↓ scroll</p>
+</section>
+
+<!-- PROFILE -->
+<section class="profile-section" id="profile">
+
+    <div class="profile-img-col">
+        <p class="profile-series">LuffyxBoa · Vol. 01</p>
+        <img src="photos/him.jpg" alt="him" />
+        <p class="profile-ep">Est. <strong>the best day ever</strong></p>
+    </div>
+
+    <!-- right: info -->
+    <div class="profile-info-col">
+        <p class="profile-vol">Character Profile · No. 001</p>
+        <h2 class="profile-name">
+            My Bubu
+            <em>captain of my heart, chaos king</em>
+        </h2>
+
+        <div class="profile-rule"></div>
+
+        <p class="profile-bio">
+            Commonly known as the boy who walked in and accidentally became the most important person in the room — and in my life. Possesses an extraordinary ability to make everything feel like an adventure, eat unreasonable amounts of food, and still look absolutely adorable doing it.
+        </p>
+
+        <div class="profile-block">
+            <p class="profile-block-label">Occupations</p>
+            <p class="profile-block-content">
+                My Favourite Person, Full-time Menace,<br/>
+                Chief Snack Consumer, Professional Heart-Stealer,<br/>
+                Captain of the Boyfriend Pirates
+            </p>
+        </div>
+
+        <div class="profile-stats">
+            <div class="profile-stat">
+                <div class="profile-stat-label">rank</div>
+                <div class="profile-stat-value">Pirate King (of my heart)</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-label">special ability</div>
+                <div class="profile-stat-value">Making me smile always</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-label">weakness</div>
+                <div class="profile-stat-value">Me (obviously)</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-label">bounty</div>
+                <div class="profile-stat-value">∞ kisses · Muah</div>
+            </div>
+        </div>
+
+        <div class="profile-tags">
+            <span class="profile-tag">chaotic good</span>
+            <span class="profile-tag">very huggable</span>
+            <span class="profile-tag">mine</span>
+            <span class="profile-tag">slightly unhinged</span>
+            <span class="profile-tag">10/10 would keep</span>
+            <span class="profile-tag">smells nice</span>
+        </div>
+    </div>
 </section>
 
 <div class="divider"></div>
@@ -203,8 +434,6 @@
     <p class="section-label">us</p>
     <h2 class="section-title">our little moments</h2>
     <div class="photos-grid" id="photos-grid">
-        <!-- Replace these with your actual photos -->
-        <!-- <div class="photo-slot"><img src="photos/pic1.jpg" alt="us" /></div> -->
         <div class="photo-slot"><p class="photo-placeholder">add photo<br/>photos/pic1.jpg</p></div>
         <div class="photo-slot"><p class="photo-placeholder">add photo<br/>photos/pic2.jpg</p></div>
         <div class="photo-slot"><p class="photo-placeholder">add photo<br/>photos/pic3.jpg</p></div>
