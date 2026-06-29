@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Catch the Hearts · LuffyxBoa</title>
     <link rel="stylesheet" href="../css/style.css" />
+    <style>
+        #canvas { cursor: none; background: #1a1030; }
+        .instructions {
+            font-size: 13px;
+            color: var(--mid);
+            margin-bottom: 10px;
+        }
+        .instructions span { color: var(--caramel); font-weight: 500; }
+    </style>
 </head>
 <body>
 <nav class="topbar">
@@ -18,17 +27,17 @@
 <div class="game-page">
     <a href="../index.html" class="back-link">← back home</a>
     <h1>Catch the hearts</h1>
-    <p class="tagline">move your basket — don't let love fall</p>
+    <p class="tagline">Boa is shooting — Luffy is catching. move with your mouse!</p>
 
     <div class="score-bar">
         <div>caught: <span id="score">0</span></div>
         <div>missed: <span id="missed">0</span></div>
     </div>
 
-    <canvas id="canvas" width="640" height="400"></canvas>
+    <canvas id="canvas" width="640" height="420"></canvas>
 
     <div class="btn-row">
-        <button class="btn btn-primary" onclick="startGame()">play</button>
+        <button class="btn btn-primary" id="play-btn" onclick="startGame()">play</button>
         <button class="btn btn-outline" onclick="stopGame()">stop</button>
     </div>
 </div>
@@ -36,52 +45,91 @@
 <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    const colors = ['#C4895A','#A86D40','#D4A574','#8B6A4F','#2E2218'];
-    let hearts = [], score = 0, missed = 0, running = false;
-    let spawnInterval = null, animFrame = null;
-    let basket = { x: 280, w: 90 };
+    const W = canvas.width, H = canvas.height;
+
+    // images
+    const luffyImg = new Image();
+    luffyImg.src = '../photos/luffy.jpeg';
+    const boaImg = new Image();
+    boaImg.src = '../photos/boa.jpeg';
+    const bgImg = new Image();
+    bgImg.src = '../photos/boa_snake.jpeg';
+
+    let arrows = [], score = 0, missed = 0, running = false;
+    let spawnTimer = null, animFrame = null;
+    let luffyX = W / 2;
+    const LUFFY_W = 70, LUFFY_H = 80;
+    const BOA_W = 90, BOA_H = 110;
+    let boaFrame = 0, shootFlash = 0;
+    let particles = [];
 
     canvas.addEventListener('mousemove', e => {
         const rect = canvas.getBoundingClientRect();
-        basket.x = (e.clientX - rect.left) * (canvas.width / rect.width) - basket.w / 2;
+        luffyX = (e.clientX - rect.left) * (W / rect.width);
     });
     canvas.addEventListener('touchmove', e => {
         e.preventDefault();
         const rect = canvas.getBoundingClientRect();
-        basket.x = (e.touches[0].clientX - rect.left) * (canvas.width / rect.width) - basket.w / 2;
+        luffyX = (e.touches[0].clientX - rect.left) * (W / rect.width);
     }, { passive: false });
 
     function startGame() {
         stopGame();
-        hearts = []; score = 0; missed = 0;
+        arrows = []; particles = []; score = 0; missed = 0;
         document.getElementById('score').textContent = 0;
         document.getElementById('missed').textContent = 0;
         running = true;
-        spawnInterval = setInterval(spawnHeart, 700);
+        spawnTimer = setInterval(spawnArrow, 900);
         loop();
     }
 
     function stopGame() {
         running = false;
-        clearInterval(spawnInterval);
+        clearInterval(spawnTimer);
         cancelAnimationFrame(animFrame);
     }
 
-    function spawnHeart() {
+    function spawnArrow() {
         if (!running) return;
-        hearts.push({
-            x: 30 + Math.random() * (canvas.width - 60),
-            y: -24,
-            speed: 1.8 + Math.random() * 2.2,
-            size: 14 + Math.random() * 10,
-            color: colors[Math.floor(Math.random() * colors.length)]
+        // Boa is top-right, shoots diagonally downward-left with some variance
+        const boaX = W - BOA_W / 2;
+        const boaY = 60;
+        const targetX = 50 + Math.random() * (W - 100);
+        const targetY = H - 60;
+        const dx = targetX - boaX;
+        const dy = targetY - boaY;
+        const dist = Math.hypot(dx, dy);
+        const speed = 3.5 + Math.random() * 1.5;
+        shootFlash = 8;
+        arrows.push({
+            x: boaX,
+            y: boaY + 40,
+            vx: (dx / dist) * speed,
+            vy: (dy / dist) * speed,
+            angle: Math.atan2(dy, dx),
         });
     }
 
-    function drawHeart(x, y, s, color) {
+    function spawnParticles(x, y, caught) {
+        for (let i = 0; i < 10; i++) {
+            const a = Math.random() * Math.PI * 2;
+            const s = 1.5 + Math.random() * 2.5;
+            particles.push({
+                x, y,
+                vx: Math.cos(a) * s,
+                vy: Math.sin(a) * s,
+                life: 1,
+                color: caught ? '#C4895A' : '#555'
+            });
+        }
+    }
+
+    function drawHeart(x, y, size, color, alpha) {
         ctx.save();
+        ctx.globalAlpha = alpha || 1;
         ctx.fillStyle = color;
         ctx.beginPath();
+        const s = size;
         ctx.moveTo(x, y + s * 0.4);
         ctx.bezierCurveTo(x, y, x - s, y, x - s, y + s * 0.4);
         ctx.bezierCurveTo(x - s, y + s * 0.8, x, y + s * 1.2, x, y + s * 1.4);
@@ -92,42 +140,171 @@
         ctx.restore();
     }
 
-    function loop() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#FAF6EF';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    function drawArrow(a) {
+        ctx.save();
+        ctx.translate(a.x, a.y);
+        ctx.rotate(a.angle);
 
-        const bx = Math.max(0, Math.min(canvas.width - basket.w, basket.x));
+        // arrow shaft
+        ctx.strokeStyle = '#E8C4A0';
+        ctx.lineWidth = 2.5;
         ctx.beginPath();
-        ctx.roundRect(bx, canvas.height - 40, basket.w, 32, 8);
-        ctx.fillStyle = '#C4895A22';
-        ctx.fill();
-        ctx.strokeStyle = '#C4895A';
-        ctx.lineWidth = 2;
+        ctx.moveTo(-18, 0);
+        ctx.lineTo(8, 0);
         ctx.stroke();
-        ctx.fillStyle = '#A86D40';
-        ctx.font = '12px Inter, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('your hands 🤲', bx + basket.w / 2, canvas.height - 20);
 
-        hearts = hearts.filter(h => {
-            h.y += h.speed;
-            drawHeart(h.x, h.y, h.size, h.color);
-            if (h.y + h.size * 1.4 > canvas.height - 40 && h.y < canvas.height - 8 && h.x > bx && h.x < bx + basket.w) {
+        // heart tip
+        ctx.translate(8, 0);
+        ctx.rotate(-Math.PI / 2);
+        drawHeart(0, -6, 8, '#ff6b9d', 1);
+
+        ctx.restore();
+    }
+
+    function loop() {
+        ctx.clearRect(0, 0, W, H);
+
+        // background — dark night sky (the snake scene vibe)
+        const grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, '#1a1030');
+        grad.addColorStop(1, '#2d1a3a');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+
+        // soft clouds suggestion
+        ctx.fillStyle = 'rgba(255,255,255,0.04)';
+        for (let i = 0; i < 4; i++) {
+            ctx.beginPath();
+            ctx.ellipse(80 + i * 160, H - 80 - i * 20, 80, 30, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // draw Boa top-right
+        const boaDrawX = W - BOA_W - 10;
+        const boaDrawY = 10;
+        if (boaImg.complete && boaImg.naturalWidth > 0) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.roundRect(boaDrawX, boaDrawY, BOA_W, BOA_H, 10);
+            ctx.clip();
+            ctx.drawImage(boaImg, boaDrawX, boaDrawY, BOA_W, BOA_H);
+            ctx.restore();
+            // shoot flash
+            if (shootFlash > 0) {
+                ctx.save();
+                ctx.globalAlpha = shootFlash / 8 * 0.4;
+                ctx.fillStyle = '#ff9ed2';
+                ctx.beginPath();
+                ctx.roundRect(boaDrawX, boaDrawY, BOA_W, BOA_H, 10);
+                ctx.fill();
+                ctx.restore();
+                shootFlash--;
+            }
+        } else {
+            // fallback silhouette
+            ctx.fillStyle = '#8B6A4F';
+            ctx.beginPath();
+            ctx.roundRect(boaDrawX, boaDrawY, BOA_W, BOA_H, 10);
+            ctx.fill();
+            ctx.fillStyle = '#EDE4D4';
+            ctx.font = '12px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText('Boa ♥', boaDrawX + BOA_W/2, boaDrawY + BOA_H/2);
+        }
+
+        // label
+        ctx.fillStyle = '#E8C4A0';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Boa Hancock', boaDrawX + BOA_W / 2, boaDrawY + BOA_H + 14);
+
+        // draw arrows
+        arrows = arrows.filter(a => {
+            a.x += a.vx;
+            a.y += a.vy;
+            drawArrow(a);
+
+            const lx = Math.max(LUFFY_W / 2, Math.min(W - LUFFY_W / 2, luffyX));
+            const catchY = H - LUFFY_H - 10;
+
+            // catch check
+            if (a.y > catchY && a.y < catchY + LUFFY_H && Math.abs(a.x - lx) < LUFFY_W * 0.6) {
                 score++;
                 document.getElementById('score').textContent = score;
+                spawnParticles(a.x, a.y, true);
                 return false;
             }
-            if (h.y > canvas.height + 30) {
+            if (a.y > H + 20) {
                 missed++;
                 document.getElementById('missed').textContent = missed;
+                spawnParticles(a.x, H - 20, false);
                 return false;
             }
             return true;
         });
 
+        // particles
+        particles = particles.filter(p => {
+            p.x += p.vx; p.y += p.vy; p.life -= 0.06;
+            ctx.save();
+            ctx.globalAlpha = p.life;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+            return p.life > 0;
+        });
+
+        // draw Luffy at bottom
+        const lx = Math.max(LUFFY_W / 2, Math.min(W - LUFFY_W / 2, luffyX));
+        const ly = H - LUFFY_H - 10;
+        if (luffyImg.complete && luffyImg.naturalWidth > 0) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.roundRect(lx - LUFFY_W / 2, ly, LUFFY_W, LUFFY_H, 8);
+            ctx.clip();
+            ctx.drawImage(luffyImg, lx - LUFFY_W / 2, ly, LUFFY_W, LUFFY_H);
+            ctx.restore();
+        } else {
+            ctx.fillStyle = '#C4895A';
+            ctx.beginPath();
+            ctx.roundRect(lx - LUFFY_W / 2, ly, LUFFY_W, LUFFY_H, 8);
+            ctx.fill();
+            ctx.fillStyle = '#FAF6EF';
+            ctx.font = '12px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText('Luffy', lx, ly + LUFFY_H / 2);
+        }
+
+        // Luffy label
+        ctx.fillStyle = '#E8C4A0';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Luffy', lx, H - 2);
+
+        // score overlay
+        ctx.fillStyle = 'rgba(245,239,228,0.15)';
+        ctx.beginPath();
+        ctx.roundRect(10, 10, 120, 36, 8);
+        ctx.fill();
+        ctx.fillStyle = '#E8C4A0';
+        ctx.font = '13px Inter, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(`♥ ${score} caught`, 20, 33);
+
         if (running) animFrame = requestAnimationFrame(loop);
     }
+
+    // draw idle frame
+    (function idleDraw() {
+        ctx.fillStyle = '#1a1030';
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = '#E8C4A0';
+        ctx.font = '14px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('press play to start', W / 2, H / 2);
+    })();
 </script>
 </body>
 </html>
