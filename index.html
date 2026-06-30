@@ -245,6 +245,8 @@
 
         /* ---- SECTIONS ---- */
         .section { max-width: 860px; margin: 0 auto; padding: 4rem 1.5rem; }
+        #games { max-width: 100%; padding: 4rem 0; }
+        #games .section-label, #games .section-title { padding: 0 1.5rem; }
         .section-label {
             font-size: 11px;
             letter-spacing: 0.16em;
@@ -264,27 +266,43 @@
         .divider { width: 60px; height: 1.5px; background: var(--caramel); margin: 0 auto; opacity: 0.35; }
 
         /* ---- GAMES GRID ---- */
-        .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+        .games-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 0 16px; }
         .game-card {
             background: var(--light);
-            border: 1px solid var(--beige3);
+            border: none;
             border-radius: 16px;
-            padding: 1.75rem 1.5rem;
+            overflow: hidden;
             text-decoration: none;
             color: inherit;
-            transition: border-color 0.2s, transform 0.15s;
+            transition: transform 0.15s;
             display: block;
+            position: relative;
         }
-        .game-card:hover { border-color: var(--caramel); transform: translateY(-3px); }
-        .game-emoji { font-size: 38px; margin-bottom: 0.75rem; }
+        .game-card:hover { transform: translateY(-4px); }
+        .game-img {
+            width: 100%;
+            aspect-ratio: 4/5;
+            overflow: hidden;
+            background: var(--beige2);
+        }
+        .game-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+            display: block;
+            transition: transform 0.3s;
+        }
+        .game-card:hover .game-img img { transform: scale(1.04); }
+        .game-card-body { padding: 1.25rem 1.5rem 2rem; border-top: 1px solid var(--beige3); }
         .game-card-name {
             font-family: 'Playfair Display', serif;
-            font-size: 18px;
-            font-weight: 400;
+            font-size: 26px;
+            font-weight: 600;
             color: var(--dark);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
-        .game-card-desc { font-size: 13px; color: var(--mid); }
+        .game-card-desc { font-size: 14px; color: var(--mid); }
 
         /* ---- PHOTOS ---- */
         .photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
@@ -343,9 +361,17 @@
 <!-- PROFILE -->
 <section class="profile-section" id="profile">
 
+    <!-- left: full bleed photo -->
     <div class="profile-img-col">
         <p class="profile-series">LuffyxBoa · Vol. 01</p>
-        <img src="photos/him.jpg" alt="him" />
+        <!-- Replace the div below with: <img src="photos/him.jpg" alt="him" /> -->
+        <div class="profile-img-placeholder">
+            drop his photo here<br/>
+            rename it <strong style="color:rgba(196,137,90,0.7)">him.jpg</strong><br/>
+            put it in the <strong style="color:rgba(196,137,90,0.7)">photos/</strong> folder<br/><br/>
+            then replace this div with:<br/>
+            &lt;img src="photos/him.jpg" alt="him" /&gt;
+        </div>
         <p class="profile-ep">Est. <strong>the best day ever</strong></p>
     </div>
 
@@ -410,19 +436,25 @@
     <h2 class="section-title">mini games, just for you</h2>
     <div class="games-grid">
         <a href="games/bubbles.html" class="game-card">
-            <div class="game-emoji">🫧</div>
-            <div class="game-card-name">Pop the bubbles</div>
-            <div class="game-card-desc">tap to pop, very satisfying</div>
+            <div class="game-img"><img src="photos/gengar.jpeg" alt="gengar" /></div>
+            <div class="game-card-body">
+                <div class="game-card-name">Pop the bubbles</div>
+                <div class="game-card-desc">tap to pop, very satisfying</div>
+            </div>
         </a>
         <a href="games/hearts.html" class="game-card">
-            <div class="game-emoji">❤️</div>
-            <div class="game-card-name">Catch the hearts</div>
-            <div class="game-card-desc">don't let love fall</div>
+            <div class="game-img"><img src="photos/pikachu.jpeg" alt="pikachu" /></div>
+            <div class="game-card-body">
+                <div class="game-card-name">Catch the hearts</div>
+                <div class="game-card-desc">don't let love fall</div>
+            </div>
         </a>
         <a href="games/memory.html" class="game-card">
-            <div class="game-emoji">🃏</div>
-            <div class="game-card-name">Memory match</div>
-            <div class="game-card-desc">find all the pairs</div>
+            <div class="game-img"><img src="photos/psyduck.jpeg" alt="psyduck" /></div>
+            <div class="game-card-body">
+                <div class="game-card-name">Memory match</div>
+                <div class="game-card-desc">find all the pairs</div>
+            </div>
         </a>
     </div>
 </section>
