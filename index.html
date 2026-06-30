@@ -351,8 +351,8 @@
 
 <!-- HERO -->
 <section class="hero">
-    <p class="hero-eyebrow">made with love, just for you</p>
-    <h1 class="hero-title">Luffy<em>×</em>Boa</h1>
+    <p class="hero-eyebrow">cutu bubu</p>
+    <h1 class="hero-title">Bubu<em>is</em>mine</h1>
     <p class="hero-message">Muah 💛</p>
     <a href="#profile" class="btn btn-primary">meet the captain ↓</a>
     <p class="scroll-hint">↓ scroll</p>
@@ -364,7 +364,6 @@
     <!-- left: full bleed photo -->
     <div class="profile-img-col">
         <p class="profile-series">LuffyxBoa · Vol. 01</p>
-        <!-- Replace the div below with: <img src="photos/him.jpg" alt="him" /> -->
         <img src="photos/him.jpg" alt="him" />
         <p class="profile-ep">Est. <strong>the best day ever</strong></p>
     </div>
@@ -470,6 +469,97 @@
 </section>
 
 <footer>made with 💛 · LuffyxBoa</footer>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+    <div id="splash-muahs"></div>
+</div>
+
+<style>
+    #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: url('photos/luffyxboa.jpg') center/cover no-repeat;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    #splash::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(245, 239, 228, 0.45);
+        z-index: 0;
+    }
+    #splash-muahs {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+    }
+    .muah-word {
+        position: absolute;
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        font-weight: 600;
+        color: var(--caramel);
+        opacity: 0;
+        transform: scale(0.3);
+        animation: muah-pop 0.6s ease-out forwards;
+        white-space: nowrap;
+        text-shadow: 0 2px 20px rgba(196,137,90,0.3);
+    }
+    @keyframes muah-pop {
+        0%   { opacity: 0; transform: scale(0.2) rotate(var(--r)); }
+        50%  { opacity: 1; transform: scale(1.1) rotate(var(--r)); }
+        100% { opacity: 0.85; transform: scale(1) rotate(var(--r)); }
+    }
+    #splash.fade-out {
+        animation: splash-fade 0.8s ease-out forwards;
+    }
+    @keyframes splash-fade {
+        0%   { opacity: 1; }
+        100% { opacity: 0; pointer-events: none; }
+    }
+</style>
+
+<script>
+    const sizes = [28, 36, 44, 52, 64, 72, 88, 96, 110];
+    const rotations = [-15, -10, -6, 0, 5, 10, 14, -3, 8, -12];
+    const container = document.getElementById('splash-muahs');
+
+    function spawnMuah() {
+        const el = document.createElement('span');
+        el.className = 'muah-word';
+        el.textContent = 'Muah';
+        const size = sizes[Math.floor(Math.random() * sizes.length)];
+        const rot = rotations[Math.floor(Math.random() * rotations.length)];
+        el.style.fontSize = size + 'px';
+        el.style.setProperty('--r', rot + 'deg');
+        el.style.left = (Math.random() * 90) + '%';
+        el.style.top  = (Math.random() * 88) + '%';
+        el.style.animationDelay = (Math.random() * 0.3) + 's';
+        container.appendChild(el);
+    }
+
+    // spawn wave of muahs
+    let spawned = 0;
+    const spawnInterval = setInterval(() => {
+        for (let i = 0; i < 4; i++) spawnMuah();
+        spawned += 4;
+        if (spawned >= 40) clearInterval(spawnInterval);
+    }, 120);
+
+    // fade out splash after 2.8s
+    setTimeout(() => {
+        document.getElementById('splash').classList.add('fade-out');
+        setTimeout(() => {
+            document.getElementById('splash').style.display = 'none';
+        }, 800);
+    }, 2800);
+</script>
 
 </body>
 </html>
